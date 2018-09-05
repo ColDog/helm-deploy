@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ template "example.fullname" . }}-task
+  labels:
+    app: {{ template "example.name" . }}
+    chart: {{ template "example.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    helm-deploy.k8s.io/task: "true"
+spec:
+  restartPolicy: Never
+  containers:
+  - name: task
+    image: alpine:3.8
+    command: ["sh", "-c", "for i in 1 2 3 4 5; do echo 'hello'; sleep 1; done"]
