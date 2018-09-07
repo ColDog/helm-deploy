@@ -53,14 +53,11 @@ def pod_status(kubectl, name):
 
 
 def await_pod(kubectl, name):
-    print("awaiting pod", name)
-
     # Wait until the container is started.
     while True:
         status = pod_status(kubectl, name)
         if status != "ContainerCreating" and status != "Pending":
             break
-        print(f"waiting for pod to start {status}...")
         time.sleep(1)
 
     # Watch logs.
@@ -71,7 +68,6 @@ def await_pod(kubectl, name):
         status = pod_status(kubectl, name)
         if status != "Running":
             break
-        print(f"waiting for pod to finish {status}...")
         time.sleep(1)
 
     if status != "Succeeded":

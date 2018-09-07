@@ -9,11 +9,13 @@ install/istio:
 	cp istio-$(ISTIO_VERSION)/bin/istioctl ./bin/istioctl
 	rm istio-$(ISTIO_VERSION).tgz
 	rm -rf istio-$(ISTIO_VERSION)
+.PHONY: install/istio
 
 install/kubectl:
 	curl -LO https://storage.googleapis.com/kubernetes-release/release/$(K8S_VERSION)/bin/linux/amd64/kubectl
 	chmod +x ./kubectl
 	mv kubectl ./bin/
+.PHONY: install/kubectl
 
 install/helm:
 	curl -L -o helm-$(HELM_VERSION).tgz https://storage.googleapis.com/kubernetes-helm/helm-$(HELM_VERSION)-linux-amd64.tar.gz
@@ -21,9 +23,15 @@ install/helm:
 	mv linux-amd64/helm ./bin/helm
 	rm -rf linux-amd64
 	rm helm-$(HELM_VERSION).tgz
+.PHONY: install/helm
 
 install: install/istio install/kubectl install/helm
-
+.PHONY: install
 
 build:
 	docker build -t coldog/helm-deploy:latest .
+.PHONY: build
+
+deploy/example: build
+	./helm-deploy.sh apply example ./example
+.PHONY: deploy/example
