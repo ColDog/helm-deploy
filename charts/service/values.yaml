@@ -1,0 +1,71 @@
+replicaCount: 1
+
+image:
+  # Image configurations, should be overridden.
+  repository: nginx
+  tag: stable
+  pullPolicy: IfNotPresent
+
+canary:
+  # Canary deployment, requires a canary tag to be specified and enabled to be
+  # set to true. This will then configure the VirtualService resource to weight
+  # requests to different subsets.
+  enabled: false
+  tag: canary
+  weight: 10
+
+service:
+  # Service configuration. Includes istio virtual service configuration options.
+  port: 80
+  path: /
+  hosts: []
+    # - chart-service.local
+  gateways: []
+    # - gateway-default
+
+resources: {}
+  # Resource limits for the deployment, these should be set in production but
+  # not having these increases chances charts run on environments with little
+  # resources, such as Minikube.
+  #
+  # Example:
+  #
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+trafficPolicy: {}
+  # Follows the istio traffic policies from:
+  # https://istio.io/docs/reference/config/istio.networking.v1alpha3/#TrafficPolicy
+  #
+  # Example:
+  #
+  # loadBalancer:
+  #   simple: ROUND_ROBIN
+  # tls:
+  #   mode: ISTIO_MUTUAL
+
+routeSettings: {}
+  # Follows additional istio route configuration from:
+  # https://istio.io/docs/reference/config/istio.networking.v1alpha3/#HTTPRoute
+  # this block must not specify match or route parameters. This will be applied
+  # to both canary and stable versions.
+  #
+  # Example:
+  #
+  # fault:
+  #   abort:
+  #     percent: 10
+  #     httpStatus: 400
+  # timeout: 10s
+  # retries:
+  #   attempts: 3

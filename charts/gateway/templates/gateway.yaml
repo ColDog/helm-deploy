@@ -1,19 +1,20 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: {{ template "example.fullname" . }}
+  name: {{ template "gateway.fullname" . }}
   labels:
-    app: {{ template "example.name" . }}
-    chart: {{ template "example.chart" . }}
+    app: {{ template "gateway.name" . }}
+    chart: {{ template "gateway.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   selector:
-    istio: ingressgateway # use Istio default gateway implementation
+    # Use Istio default gateway implementation:
+    istio: ingressgateway
   servers:
   - port:
       number: 80
       name: http
       protocol: HTTP
     hosts:
-    - "example.com"
+{{ toYaml .Values.hosts | indent 6 }}

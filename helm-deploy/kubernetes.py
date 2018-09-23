@@ -74,17 +74,12 @@ def await_pod(kubectl, name):
         raise ValueError(f"Pod/{name} exited with status: {status}")
 
 
-def render_chart(filename, name, namespace):
-    return sh.sh(
-        "helm",
-        "template",
-        "--name",
-        name,
-        "--namespace",
-        namespace,
-        filename,
-        capture=True,
-    ).decode()
+def render_chart(filename, name, namespace, values=None):
+    args = ["helm", "template", "--name", name, "--namespace", namespace]
+    if values:
+        args = args + ["--values", values]
+    args = args + [filename]
+    return sh.sh(*args, capture=True).decode()
 
 
 def is_task(manifest):

@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ template "service.fullname" . }}
+  labels:
+    app: {{ template "service.name" . }}
+    chart: {{ template "service.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  host: {{ template "service.fullname" . }}
+  subsets:
+  - name: stable
+    labels:
+      version: stable
+{{- if .Values.canary.enabled }}
+  - name: canary
+    labels:
+      version: canary
+{{- end }}
+{{- with .Values.trafficPolicy }}
+  trafficPolicy:
+{{ toYaml . | indent 4 }}
+{{- end -}}

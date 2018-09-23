@@ -1,0 +1,44 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ template "service.fullname" . }}
+  labels:
+    app: {{ template "service.name" . }}
+    chart: {{ template "service.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  hosts:
+    - {{ template "service.fullname" . }}
+{{- with .Values.service.hosts }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- with .Values.service.gateways }}
+  gateways:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  http:
+  - match:
+    - uri:
+        prefix: {{ .Values.service.path }}
+{{- with .Values.routeSettings }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+    # Route configuration respects canary rules if added. This will balance
+    # between a subset stable and a subset canary. Both are deployed using this
+    # chart.
+    route:
+{{- if .Values.canary.enabled }}
+    - destination:
+        host: {{ template "service.fullname" . }}
+        subset: stable
+      weight: {{ sub 100 .Values.canary.weight }}
+    - destination:
+        host: {{ template "service.fullname" . }}
+        subset: canary
+      weight: {{ .Values.canary.weight }}
+{{- else }}
+    - destination:
+        host: {{ template "service.fullname" . }}
+        subset: stable
+{{- end -}}
